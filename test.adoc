@@ -1,0 +1,19 @@
+Welcome to AsciiDocLIVE!
+------------------------
+
+AsciiDocLIVE is a *free online http://www.methods.co.nz/asciidoc/[AsciiDoc^]
+editor*.
+
+* Just type AsciiDoc source text into the *left* pane,
+* ...and the live preview appears in the *right* pane!
+
+What's AsciiDoc?
+~~~~~~~~~~~~~~~~~
+
+AsciiDoc is a human-readable text document format for writing notes,
+documentation, articles, books, ebooks, slideshows, web pages, man pages and
+blogs, and more. AsciiDoc files can be translated to many formats including
+HTML, PDF, EPUB, and man page.
+
+To learn more, visit the AsciiDoc home page at
+http://www.methods.co.nz/asciidoc/[^].

@@ -10,3 +10,4 @@
 
 - [C++ Coding Standards and Style Guide by NASA](https://ntrs.nasa.gov/search.jsp?R=20080039927)
 
+NOTE: The document in Russian was primary, the English document was received by google translate

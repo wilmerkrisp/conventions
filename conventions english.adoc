@@ -1,0 +1,2101 @@
+= conventions & programming culture
+
+* Camel case: numberOfPeople
+A series of words, with each intermediate word started with a capital letter. Called "Camel Case" because the capital letters make it look like the humps of a camel.
+
+* Kebab case: number-of-people
+Hypehated words - like chunks of meat or vegetables on a kebab skewer. Note that cannot case only works in a gew languahes such as Tcl and Perl 6, as the minus sign most usually is the subtraction operator.
+
+* Snake case: number_of_people
+Words separated with underscores - the word snakes along past the underscores. Like Kebab case which is of limited (language) use, you can use Snake Case with most modern languages.
+
+* Hungarian (Systems) notation: iNumberOfPeople
+In hungarian notation, you preceed the variable name with an additional character or characters to indicate the type of variable - in Hungarian Systems notation, that's an indication of the internal data type such as i for Integer. You can see the developemnt of Hungarin Systems Notation from old Fortran conventions where variable names starting with I J K L M or N were integers, and other were floats.
+
+* Hungarian (Apps)) notation: cntNumberOfPeople
+Prefixing the name of the variable with character(s) to indicate the use make of a variable within the application - in my example, I have used cnt to incicate it's a counter ... and in my old Fortran programs you'll find "JPxxxxx" all over th eplace to indicate an integer pointer.
+
+* Shortening and English / American
+Should you use init, initialize or initialize as the name for a piece of setup code? Some languages will force a built in standard on you for such specials, but I strongly recommend that you use your own convention (for your organization) rather than mixing them up. There's nothing quite so frustrating as typing to debug a piece of code where sometimes the word colour is used, and at other times the word is color
+
+
+== 1) annotations
+.NAMING
+
+* add annotation suffix to name
+
+
+.CONVENTIONS
+
+* areas of application should be specified
+[source,java]
+        @Target( { ElementType.ANNOTATION_TYPE, 
+        ElementType .CONSTRUCTOR, 
+        ElementType .FIELD, 
+        ElementType .LOCAL_VARIABLE, 
+        ElementType .METHOD, 
+        ElementType .PACKAGE, 
+        ElementType .PARAMETER, 
+        ElementType .TYPE, 
+        ElementType .TYPE_PARAMETER, 
+        ElementType .TYPE_USE})
+
+
+* you cannot create an empty marker interfaces with no members, do you need to use a marker annotation
+
+	* when to use the interface
+	 		** TC interface is a type then you can set parameters of type Serializable and this allows you to notice errors during compilation 
+		** ask yourself if I might want to write one or more methods that would only accept objects of such an interface?
+		** do I want to restrict the use of this token to elements of a particular interface forever?
+
+	* when to use annotation
+	** if I want to add more information to the token in the future?
+
+= = = 2) method parameters and method argument validation
+.NAMING
+
+* parameter names in methods start with a small letter, camel style
+
+* in the two-letter acronyms are the first letters of both small
+[source,java]
+        - for example ioStream
+
+* TC parameters-methods are displayed in the documentation and auto-substitutions for them, too, must apply naming rules
+
+* parameter names must be descriptive enough to be used with their types to determine their meaning in most scenarios
+
+* if there is no other sense in the extreme case to call the parameters:
+[source,java]
+        - left, right
+        - value
+        
+* Do NOT use numeric indexes
+[source,java]
+        - for example: param1, param2
+
+* (option 1) it is recommended to base on meaning rather than type
+       ** TC IDE will show the type itself
+* (option 2) the name of the parameter can be the same as the name of the user-defined type 
+         ** it saves meaningful names
+	   ** but it is likely that this title is not descriptive enough to be useful
+* (??option 3) if the word matches a key his to isovercome, but that it was similar to the original
+		** for example not class but clazz
+* (??вариант4) the name of the insignificant of the parameter, those that which we don't use you can simply write a dash
+		** for example (_)->"rez";
+
+.CONVENTIONS
+
+* ligbez terminology: 
+	** method parameters - names of variables in the method Declaration, for example func(String a,int b)
+	** method arguments - the actual values passed to the input method at run time, such as func("mike",12)
+
+	* reference type is the variable type when declaring ** compile time is known
+		** used for overload
+	* object type - the real type of the assigned object 
+		** calculated runtime
+		** used for override
+
+	* another term for local variables:
+		** automatic variable
+		** variables on the stack
+		** method variables
+
+1) parameter type - the highest possible type in the hierarchy ::
+        * then the set of possible object subtypes that this parameter can accept will be expanded
+        * theoretically, the most pre-respectful interface is Iterable<> and not a specific type of collection (in case you just need to list items)
+	  * practically the same, the collection is now the preferred method for returning TC values and is iterable and contains stream, of the drawbacks: the number of elements should be less than 2^32
+	  		** select the interfaces List, Set, Queue, Map the most suitable for the task at hand and not the specific implementation
+			** but writing frameworks recommended superobese the Iterable
+
+			2) if you want to call certain methods of the parameter object, on the contrary, you need to limit the "highest possible type in the hierarchy" ::
+
+* parameters cannot be reserved "for the future"
+        * it is better to make an overloaded version of the method with a new parameter in the future
+
+* the number of parameters should not exceed 4
+	** otherwise, the user will not remember them and will always be all the time to look in help
+* to reduce the number of parameters
+	** split the method into several (as for example in NEW-SET-CALL for each parameter a separate seter)
+	** make a group of parameters in the value class (nested static) (helper class)
+	** all the parameters of stitches in the pattern Builder, which parameters you can assign in the queue (so that the Builder applies to the mutable object)
+	** use Currying, and assign these parameters in advance to a function that will return another function (an analogue of our method)
+
+
+   * avoid a number of parameters of the same type, so that the user does not confuse them
+
+
+
+. PATTERN IS NEW-SET-CALL IN MUTABLE CLASSES    
+    
+1) methods do not have parameters that must be constant in all method calls in basic scenarios  ::
+        * TC such constant arguments must be specified by properties
+        * those only such parameters which are necessary for each call and do not remain constant
+        
+2) you should add a parameter to the method if I want to focus on the parameter  ::
+        * those to make the obvious connection between the parameter and the method
+        * such as timeout to specify the method, despite the fact that it is the same for each call
+    
+3) you should check the consistency of the object, as there may be problems due to   ::
+	  * the method should check all used properties for null and valid values
+        * properties can be set arbitrarily and independently resulting in inconsistent object state
+        * the default constructor allows users to create a sub-initialized instance
+ when consistently object should cause an IllegalStateException exception ::
+        * the exception message should clearly explain which properties should be changed to get the object in valid States
+        * exceptions should be thrown when the operation is performed and not when the component is initialized
+
+.CHECK ARGUMENTS
+
+1) you should allow null pointer to be passed as an argument to the method and inside the method do a check for null and valid values  ::
+        * to avoid null checking before calling a function and move it inside the function call 
+        and in the case of zero inside the method to put a default value and possibly log such an input argument
+        
+2) and if null is not allowed then call ArgumentNullException  ::
+
+* it is necessary to check all arguments of public, protected methods passed to the input method by the user
+
+* it is necessary to test arguments as thoroughly as possible
+         ** TC it will provide the best error message
+        
+* if an error occurs in the argument, call ArgumentException    
+
+* it is necessary to remember that mutable objects can change after checking
+     ** 1) if I don't want to spread the side effect, I can make a COPY of the object(!not a copy of the link), check IT and pass IT on
+	** 2) I can convert/copy a mutable object to a non-mutable object, then I won't have to copy it again on the getter
+	** 3) it is better to accept only non-mutable objects (and make the whole hierarchy of class composition non-mutable)
+	 ** check should be done already on the copy to protect against attack TOCTOU (time-of-check/time-of-use)
+	 ** this applies not only to non-mutable classes but also to mutable classes: if the object is mutable then think: are you Tolerant of unexpected mutation of the object? If you are not ready for an unexpected mutation mutable object then make a protective copy !  This applies to heterosexual and Setaram
+
+1) the check itself does not necessarily have to be made directly in this public method, it can be made at a lower level in the sub-methods and etc    ::
+
+2) argument checks are better placed up the hierarchy closer to the common api and further away from advanced low-level scenarios  ::
+        * TC low-level functions are called more often and they cost more       
+
+
+1) use assertions to check method parameters of private methods  ::
+	* use assertions for situations that can never occur
+
+
+
+.COMMON TYPES vs SPECIAL/USER TYPES
+
+* we recommend that you use specific data types (such as URL) rather than General data types (such as String) 
+        ** for example, a URL is recommended even if you can use String instead
+        
+* specific types should be used everywhere for:
+        . class properties
+        . the return values of methods
+        . parameter types and the actual arguments of the methods
+
+* for its methods accepting a SPECIFIC TYPE(e.g. url) +
+    for convenience, it is recommended to provide for stupid users overloaded versions of methods that take a COMMON TYPE(for example, string) +
+    but calling version with specific type (those URLs)
+
+        ** if a string is received from the user often enough, you should add a convenient overload to receive the string
+        ** such methods are intended as helpers for common scenarios
+        ** be selective and provide such helpers only for frequently used options
+        ** not all methods with a parameter of type url blindly automatically reboot versions with stroke TC preferred api based on url
+        ** it is impossible to have only the version of the method without method with a String with the URL
+        
+    
+    
+    
+    
+    
+    
+
+=== generate
+.NAMING
+
+* should be called T for obvious parameters
+
+
+* the name of the parameter is a constraint name in the extends are prefixed with T
+        ** for example <TString extends String> , <TKey, TValue>
+
+* in a parameterized method, call the parameter E
+        ** to distinguish it from the parameters of generic classes
+
+* alternative one-letter naming system:
+[source,java]
+	E for an element
+	K for a map key
+	V for a map value
+	N for a number
+	T for a generic data type
+	S, U, V, and so forth for multiple generic types
+
+
+	.CONVENTIONS
+
+* not recommended for types <?>
+        ** for example, Collection<?>
+
+* not recommended <T> void Method (T p1)
+
+=== vararg
+.NAMING
+
+* argument name must be plural
+
+
+.CONVENTIONS
+
+(1) if users pass arrays with a small number of elements, it is better to form vararg  ::
+        * but if the user will transmit many elements of the vararg is also nice
+        
+(2) replace more than 3 parameters of the same type with vararg      ::
+        * for example (object1,object2,object3,object4) on (... objects)
+        * all parameters are of the same type
+        * if the parameters differ only in numeric suffix
+        * if the method does not already have an overloaded version of the input receiving array
+        
+(3) method with vararg, on the contrary can be overloaded methods with different numbers of parameters   ::
+        * to provide higher speed
+        * for example, add to the of(e) method... elements)
+[source,java]
+                                        of(E e1)
+                                        of(E e1, E e2)
+                                        ...
+                                        of(E e1, E e2, E e3, E e4, E e5, E e6, E e7, E e8, E e9, E e10)
+
+* if the nick is almost always the input of the transmit array to the vararg is not recommended
+ 
+* you should always check vararg argument for null and if null then call expansion
+ 
+     * if you want vararg to have arguments, it is better to declare it with a separate first argument, for example, instead of checking for non-zero inside
+	** int min(int firstArg, int... remainingArgs)
+
+.EXTENSIBILITY 
+    
+* it is recommended to move the array type parameters to the end to leave the possibility to make vararg from the bottom in the future
+    
+* it is recommended not to overload methods with vararg TC it will confuse the user
+* methods with vararg can be preloaded, the method is already without the same vararg
+[source,java]
+         for example, method(String param1,String ...objects)
+         method(String param1,String[] objects, String param2)
+    
+
+== 3) constructors
+.NAMING
+
+
+.CONVENTIONS
+ 
+* for a type conversion operation, it is better to use an explicit constructor or factory instead of transformation methods
+        ** TC need to show that in this case, an object is explicitly created
+        ** for example, if a non-object(elementary type) is converted to an object
+        ** in such operations, you can call ClassCastException
+
+* if there are no constructors, the default constructor must be specified explicitly
+        ** in order not to break the existing code when entering the constructor with the parameter 
+        ** TK it will automatically remove the implicit default constructor
+
+* constructors should do nothing but accept constructor parameters and set properties
+        ** constructors should throw exceptions if required
+
+* you cannot call overridable(normal or abstract) methods inside the constructor
+        ** the TC method can be overridden by a subclass and calling this method will cause an error for an uninitialized subclass from the base class
+        ** you can call super.someMethod() TK will be called neperedavaemye version
+	  ** you can call final methods and private methods because they are not overridable
+        ** see pattern of private helper methods called from overridable methods
+
+* designers should be preferred to factories
+        ** constructor this is the most natural way to create objects: as a result of the constructor's work, a unique instance of a class of a certain type will be created, initialized and returned
+        ** users will search for them before they find factory methods
+        ** auto-substitution in IDE does not work for factories
+        ** factories sacrifice detection capability, convenience and ease of use
+        ** most users find that the designer template is simpler and more detectable, because users are used to objects created by designers
+
+
+.I) THE PATTERN OF NEW-SET-CALL IN MUTABLE CLASSES
+
+* there must be a default constructor
+        ** it is recommended to design components so that they can be used after a very simple initialization
+        ** constructors that do not accept parameters are called default constructors or default constructors
+        
+   * can be a very simple constructor with one parameter (parameters of basic properties)
+        ** you should use the constructor parameters to set the basic properties
+        ** should not be difficult designers of TK most of the settings are initialized using the setting properties
+        ** all of the constructor parameters correspond to properties and just inicializirati them
+
+* there should always be a choice:
+	    . call the constructor with parameters, so you should make the constructor with parameters specifying all properties
+	    . call the default constructor but then set the properties via seters
+
+* the names of the constructor parameters must match the names of the properties
+        ** except the case of the first letter
+	    
+* simple tasks of one main scenario should be feasible with only one object
+        ** users cannot create instances of multiple objects in the same script
+        ** each of the top 5 main scenarios should have no more than one new operator 
+
+- advantages 
+	** that you can set the parameters selectively
+	** there can be several varargs parameters, for example each property has its own vararg, 
+		*** unlike a constructor, where there can only be one vararg in one constructor
+
+* possible problems: the default constructor allows users to create an under-initialized instance
+        - which may result in an invalid state of the object when the method is called
+        - problems should be mitigated by exceptions/error messages in methods
+        - exceptions should be thrown when the operation is performed and not when the component is initialized
+	  - those in the constructor I can allow to assign null, but I signal about it in log
+
+
+
+	  .II) the pattern of NEW-CALL nemetalni CLASSES
+
+* you should design types so that objects cannot exist in an invalid state
+        ** therefore, you should check the consistency of the object in the constructor and call IllegalStateException 
+	  ** in the designer, do check for null and valid values
+
+* in the designer, all parameters required to configure the object are set at once
+        ** settings cannot be changed after initialization in the designer   
+
+* it is necessary to make the constructor without parameters private to save the user from an error
+	** and to create empty objects make an explicit separate factory
+
+
+.III) the PATTERN BUILDER CLASSES nemetalni
+* the client calls a static method to get the Builder (or immediately the Builder constructor which is an inner static class). The client then calls the setters on this object to set all the parameters of interest. Finally, the client calls the build method to generate an object that will be immutable. The build method calls the private constructor of the object receiving the Builder object
+
+	** you can get a non-mutable object in a consistent state, as if manually "freezing" the object after its creation is completed,
+	** one Builder can be used to create multiple objects
+	** allows you to get rid of the cascade/ladder/telescoping constructors
+	** worse performance of TK it is necessary to create in addition to object and builder
+	** if in addition to the Builder already a lot of designers it is difficult to maintain such code
+
+
+.IV) CURRYING
+* all parameters that should be constant to make a separate function, which should return another function(= our original method)
+	** a variable parameters will have this second return function
+
+
+.FACTORY ADVANTAGES
+
+1) singleton  ::
+        * the method that returns a singleton must be called getInstance
+	  * BUT the best way to implement singleton is through enumeration
+
+2) builder/object Assembly ::
+	* usually need to nemetalni classes
+
+3) caching ::
+
+4) sharing objects, object pool ::
+	 * to preserve identichnosti instances nemetalni classes (as strings in the constant pool)
+
+5) when the specific subtype of the return type will be known only the runtime ::
+        * the disadvantage of constructors is that you cannot dynamically resolve the type of what you return at run time, 
+        you cannot return a previously distributed instance of a class(such as a cached instance). 
+        * If I am sure that I will never need these features, then designers are the best choice
+        * creates only instances of a specific type/subtype (and not all in all)
+	  * can return a hidden private class object / hide class implementation
+       * at the time of writing the factory , the type of returned class may not yet be / late binding in services and services to service providers
+        
+6) it is recommended to use factories if the presence of a named method is the only way to make the operation obvious ::
+        * TC designers can not have names sometimes when using the designer there is a lack of information about the context 
+        and because of this, the user has a bad idea what the operation does 
+       * you can make several factories with the same signature. Because static generation methods have names, they do not include a constructor constraint that prevents a class from having more than one method with a given signature
+        
+7) for value type conversion operations ::
+        * such methods take a value type in one view and convert it to an instance of a class of another value type, 
+        keeping the same logical state
+        * this is done not through the constructor so that the creation of the object was not noticeable, was implicit
+        * for example, d=DateTime.parse('01/02/2019')
+        * for example, e=MyEnum.valueOf("SUMMER")
+
+8) copying factories:  ::
+	* for non-mutable classes, it makes no sense to support copying objects (in constructors or factories) because copies will be virtually indistinguishable from the original.
+	* for non-mutable classes, static copy generation methods make sense if they get a more General interface parameter and a mutable argument (see as in Java collections) they are called conversion constructors / conversion factors 
+
+9) copy of factory: in the mutable objects the serial numbers and IDs to be copied inappropriately ::
+	* TC they naturally should vary
+
+8) the factory can output the generated types types from the context (type inference) thus making the record more compact  ::
+
+      9) you can put such factories into interfaces (and a hidden class right into the interface method) ::
+
+10) if I use only static factory (because of all private constructor) then such class cannot be inherited ::
+
+11) the problem of detecting such factory methods is solved by naming conventions ::
+
+12) can use factory as lambda argument of supplier :: * for example, Elvis::instance as Supplier<Elvis>
+
+
+.PATTERN FACTORY METHOD   
+
+
+* often this is a static method
+ 
+* often the factory method belongs to the same type that it produces
+ 
+* you should call the method of, CreateCopyOf, CreateDeepCopy
+[source,java]
+		- valueOf (analog of from or of) returns the object type. This is a static generation method . Returns an instance that, roughly speaking, has the same value as its parameters. Static generation methods with this name are actually type conversion operators.
+		- of aggregating method, takes several parameters and incorporates them
+			- in java9, methods that return non-mutable copies of collections are called "of" (take input parameters without converting them). 
+			- a more concise alternative to valueOf
+			 an example of that List.of("1","2","3")
+	     - instance/getInstance — returns an instance that is described by the parameters, but you cannot say that it will have the same value. In the case of singleton, this method returns a single instance of the class. This name is common in systems with the provision of services
+		- example, StackWalker luke = StackWalker.getInstance(options) 
+	     - create/newInstance is the same as getInstance, only newInstance gives a guarantee that each instance is different from all the others.
+	     - getType is the same as getInstance, but is used when the generation method is in another class. Ture denotes the type of object returned by the generation method.
+	      - newType is the same as newInstance, but is used when the generation method is in another class. Ture denotes the type of object returned by the generation method.
+	     - type (short analogue of getType / newType)
+		- example, List<Some> l = Collections.list(enum)
+	  	- from converts input parameters to a target class instance (may include loss of information)
+				- for example Date d=Date.from(instant)
+	 	- parse parses the input string to produce an instance of the target class
+	  	- parseInt returns primitive type
+
+
+
+	  	.PATTERN TYPE FACTORY / ABSTRACT FACTORY
+ 
+* this is the type with abstract factory method
+
+* factory method returns a dynamically defined subclass
+
+* you should name the type of the generated type+Factory    
+
+.NAMING
+
+
+.CONVENTIONS
+
+* the user has no control over when the initializer is called
+
+* you cannot throw exceptions from the initializer 
+        ** TC then the type will be unusable
+        ** but this type can still be surrounded by try-catch
+
+* it is not recommended to use initializer to initialize static fields
+        ** it is better to initialize static fields when declaring for example because they can be made final 
+        ** it is better to initialize static fields in a separate static method that can return the expected output 
+
+
+== 4) libraries
+.NAMING
+
+* the library name can be the same as the package hierarchy
+        ** company-product|technology-feature.DLL
+        ** company-product|technology.DLL
+        ** each word with a small letter
+
+.SCENARIOS
+
+* break module packages basic and advanced scenarios
+        ** high-level api and low-level
+        ** high-level api wraps low-level api in convenient facades
+ 
+* It is NOT recommended to create deep package hierarchies
+        ** TK them hard to browse all the time climbing up the hierarchy
+        
+* It is NOT recommended to create a large number of packages
+
+* it is recommended that you model high-level concepts (such as physical objects) rather THAN system-level tasks 
+        ** for example, components should model files, directories, disks rather than streams, formatters, Comparators
+
+.1) THE MAIN SCENARIOS
+
+* most developers use a small set of common scenarios
+        ** therefore, all efforts should be focused on these several common scenarios
+
+* those key scenarios is the most commonly used areas of functionality
+
+* availability of simplified high-level operations is essential for those developers, +
+    who do not want to learn the full range of features +
+    they just have to solve their often very simple tasks
+          
+* core script packages must be higher in the hierarchy than advanced
+        ** those types of advanced scripts should be placed in sub-Packages/sub-Classes of basic scripts
+
+* the simplest and shortest names to use for types of common scenarios
+        ** to enable users to have it right the first time makes type, even if it is contrary to the inheritance hierarchy
+        ** best and most easily recognized names for the most commonly used types (even if the name better matches another rarely used type)
+        ** leaves should be a more beautiful name than root TK most users use only leaves and not roots
+        ** this increases the "visibility" and user findability of the types from the main scenarios
+
+* common api should include 5-10 main scenarios
+
+* only one type of object should be created in the most basic scenarios
+
+* you should optimize the performance of the core api
+
+* you can borrow script names and common parts from other well-known APIs, frameworks, and libraries
+        ** then the user will already know how to handle the new api by analogy with the other api already known to him
+        ** copy only the General part of the api, should be unique for its
+
+* common api should be simple
+        ** you should ensure that simple API scripts can be used without DOCUMENTATION
+        ** the developer should be able to start using the api IMMEDIATELY
+        ** self-evident api does not require knowledge of the interaction of multiple objects within 
+        ** the worst part is the api design, which looks simple, but once developers start using it, 
+         they find that it is not (sometimes find with great difficulty and hours of digging)
+
+* make sure that the components support the create-set-call pattern
+        ** users should be able to code most scenarios through this pattern   
+
+* should not be extensive initialization(and configs) for basic scenarios +
+        TK they raise the threshold of entry and require knowledge of underwater relationships
+           
+
+.2) ADVANCED SCENARIOS
+
+* rarely used types should be placed in separate sub-packages        
+        
+* low-level APIs must also fully duplicate the functionality of the high-level api for the developer to choose
+
+* complex things should be possible with the advanced api
+        ** at least if not easy ,as in the main scenarios, then at least possible
+        ** in order to understand the extended api, the user will need documentation and knowledge of the internal implementation of the low-level api
+
+
+
+
+        .CONVENTIONS
+
+* availability of classes open for configuration is one of the main differences between the infrastructure and the library
+    
+* different frameworks/libraries/modules should be compatible with each other
+
+* libraries should be "boring" (only basic functionality)
+
+* users cannot be required to do anything other than code
+        ** for example, configured components in a configuration file, generated resource files
+        ** antipattern example: IoC configurable in Spring Framework or Spring boot configuration file
+
+* split functions into separate types so that properties/methods do not overlap
+
+    
+
+=== packages
+.NAMING
+
+* the package names in the hierarchy
+        ** company.product|technology.feature.subnamespace
+        ** each word with a small letter
+        ** the company is registered on the Internet domain name provides uniqueness in the world 
+			*** use a reversed domain name (those not vova.com and in reverse order com.vova)
+			*** the hyphen in one part of the domain name should be replaced with an underscore
+			*** if one of the parts of the domain name begins with a digit (or non-letter character), it should be added to the beginning of the underscore
+			*** if one of the parts of the domain name matches one of the Java keywords, it is necessary to add an underscore to the end of it
+        ** product name must be sustainable rather than short-term technological marketing (TK it in a namespace will remain forever)
+	  ** Developers should take steps to avoid the possible coincidence of the names of two published packages by selecting unique package names for widely distributed packages.
+
+
+
+* package name must be different from type/class
+
+.CONVENTIONS
+
+* the package should NOT be less than 5 types
+
+* types from the same script must be in the same package
+        ** not to import a large number of packages
+
+* the main package should NOT be a deep hierarchy, many levels TC user all have a long time to learn
+    
+
+
+== 5) methods
+.NAMING
+
+* ALL rules apply to public members only
+        ** for private methods, use the suffix _
+        
+* method names start with a small letter, camel style
+
+* methods are referred to as verb phrases
+        ** the first word can be made a verb in the active form
+        ** thus methods differ from the names of types of nouns
+
+* method and property names should be long, descriptive, and detailed
+        ** TK now, IDs can still gain Avtozavodskaya input
+        ** name according to the task to be solved, not the implementation details
+
+
+ * where possible and appropriate, base the method names of the new class on the method names of the existing class, especially the JavaSE API class, to make them easier to use.
+* standard prefixes for the method names:
+[source,java]
+		- compute means that the operation is calculated and cached for a long time
+        	- find means it is a simple search method with a minimum of calculations
+       	- initialize means that the object/concept is set
+	  	- assert methods for the verification of the object causing exasan
+	  	- a method that returns the length of something must be named length, as in the String class.
+	  	- a method that checks the logical condition V associated with an object (or requesting the state of an object) must have an isV. An example is the is Interrupted method of the Thread class.
+	 	- with returns a copy of the object with one modified element
+	 	- to converts an object to another type
+		- as returns a representation of an object of a different type than the object itself
+		- Oh ..Value returns a simple type with the same value as the object
+		- at combines this object with another
+		- format formatted output
+		- plus returns a copy of the object with the addition of
+		- minus returns a copy of the clipped object
+	 	- a method that converts the object to some format F should be named toF. Examples of such methods are the toString method of the Object class and the methods toLocaleString and toGMTString of class java. util. Date.
+		- sin and cos methods of the class java . lang.Math have convenient mathematical names, even though these names violate the conventions below (they are short words, not verbs).
+
+* the method name must not include the name of the type
+        ** TC is redundant and type and so visible
+        ** for example line.getLength() and not line.getLineLength();
+
+* Boolean properties and functions must make sense as an English phrase
+        ** for example, if(collection.Contains(item) is better than if(collection.IsContained(item))  
+        ** for example if(expression.Matches(text) is better than if(expression.Match(text)
+* nested if not recommended 
+	   ** TK is very poorly read
+	   ** better else if , switch instead
+
+* symmetric methods should be called symmetrically
+[source,java]
+        - get/set
+        - add/remove
+        - create/destroy 
+        - start/stop
+        - insert/delete
+        - increment/decrement 
+        - old/new 
+        - begin/end 
+        - first/last 
+        - up/down 
+        - min/max
+        - next/previous 
+        - old/new 
+        - open/close 
+        - show/hide 
+        - suspend/resume
+
+
+
+        .CONVENTIONS
+
+* if the method only provides access to the value, there should be a property (getter/setter)
+
+* operation returning the internal state is better to do the method and not the property
+    
+* the operation returns a different result each time, even if the parameters are unchanged, it is better to do the method rather than the property  
+        ** For Example Guid.NewGuid() , DateTime.Now() 
+
+
+    
+
+=== overload
+.NAMING
+
+* the additional parameter of the method to be reloaded should be clearly named +
+    so that you can see what the default value will be in the absence of this parameter +
+    (in another version of the same reloaded method) +
+        ** for example, the names method(name) and method(name, ignoreCase) show that the first method ignores case
+
+* you should call the same parameters in different reloaded methods the same
+        ** they must also be in the same order from the beginning
+
+
+
+
+.CONVENTIONS
+
+* it is not recommended to do two reloaded functions with the same number of parameters, because it will confuse users
+	** instead of rebooting, it is better to give a few different names. for example, writeBoolean(boolean), writeInt(int), and writeLong(long)
+	** avoid overloading designers by replacing them with factories with different names
+
+* if you still want to do overload with the same number of parameters
+	** it is better to have at least one parameter of type +instead
+	so that they can not be led to one another
+
+
+
+
+
+
+=== redefinition
+.NAMING
+
+* you should call the same parameters in the original and overridden methods the same
+        
+* the name of the method abstract = the name of a public method + suffix Core
+        ** you cannot use the legacy Impl suffix
+
+* use @Override annotation everywhere
+
+.CONVENTIONS
+
+	* inheritance can be safely used within a package (those with package access level) where the implementation of both the subclass and the superclass is under the control of the same programmers.
+	* inheritance violates TC encapsulation, the proper functioning of a subclass depends on the details of its superclass implementation.
+	* by default, a regular class (not intended for inheritance) is better to do final or with all private constructors
+
+.FINALIZATION METHODS
+
+* it is recommended to finalize user-defined methods overridden by abstract
+        ** especially if I'm not planning on thinking about extensibility further here 
+
+* once I finalize the method, I can avoid the side effects of inheriting my user class
+
+* all public methods it is possible to make the final, and template methods to make abstract
+        ** as an alternative to the pattern "calling private helper versions of methods from public"
+
+
+.EXTENSIBILITY ABSTRACT METHODS
+
+* an abstract method enforces the extensibility   
+
+* if you make the abstract method, the user must exactly inherit it
+
+* should be carefully documented 
+        ** TC user need to explain in detail how to replace them, +
+        explain to the user what is the pattern template method and etc
+
+* should be carefully designed: 
+        ** those should be a clear scenario requiring extensibility, 
+        ** those you have already come up with how the user should use them
+
+* it is impossible to make the members of the abstract, if there is no good reason and you consider the cost of designing, testing, and support for abstract methods
+
+* changes to abstract methods in the future pose a greater risk of compatibility issues
+
+* you should do abstract methods as well and protected
+
+
+.EXTENSIBILITY PROTECTED METHODS        
+
+* protected method provide extensibility without complicating the main public interface
+
+* protected methods should be designed as carefully as public 
+        ** those within need to provide the same level of inspection and documentation
+        
+* it is not recommended to make public methods abstract 
+        ** TC chip pattern is just to spread the public and abstract methods        
+        
+.THE EXTENSIBILITY OF THE ABSTRACT PROTECTED METHODS 
+
+* abstract methods are created protected only for extension AND not for direct use by the user
+
+.PATTERN TEMPLATE METHOD
+
+* ABSTRACT should make only the longest overload
+        ** all shorter versions will use this longer version
+        
+* template method should do PROTECTED abstract so that extensibility is manageable
+       ** those it could not be called directly from the outside but had to be redefined
+                
+* in short neperedavaemye versions will be implemented all boring logic check input parameters  
+        ** such methods can be made public final
+
+* it is recommended to limit extensibility only to what is ABSOLUTELY NECESSARY with template method  
+
+* this pattern should be used to achieve controlled extensibility TC user should only override some methods
+
+* you cannot overload the abstract method
+        ** TK will have two abstract methods and both will have to inherit at the same time, +
+        and the user can not know and override only one method
+
+* it is recommended to check the parameters in a public method to not check them every once in abstract methods
+
+
+
+.PATTERN CASCADE FACADES
+
+* pattern is used to centralize logic in one place
+
+* you can use the reload ladder: the method uses a call to the next overloaded with a +1 parameter
+        ** to centralize logic in one place
+
+* pattern can be replaced by pattern Builder
+
+* the latest method in ladder can be just protected by abstract template method
+        ** with the largest number of parameters
+
+.PATTERN PIRIVATE/FINAL HELPER METHODS CALLED FROM THE METHODS (WHICH WILL BE OVERRIDDEN)
+
+	* used in classes designed to inherit so that implementation details do not leak into subclasses
+	* in the class for nasledovne use helper method's
+		** for each public method generate a private counterpart(helper method)
+		** inside each public method should only be calls buried counterparts
+		** helper methods should only call each other and not open methods to avoid calling the inherited class
+
+
+.REPLACEMENT PATTERN OF INHERITANCE FOR COMPOSITION
+
+	* simply base class inheritance is replaced by composition inheritance (implementing interface) with forwarding
+		1. forwarding class: the forwarding class implements the common interface and  
+		contains a reference to the base class 
+		and all methods forward to the base class  ::
+[source,java]
+			public class ForwardingSet<E> implements Set<E> {private final Set<E> s;
+		2. decorator class: inherits the forwarding class
+		and as a decorator adds some additional functionality  ::
+[source,java]
+			public class InstrumentedSet<E> extends ForwardingSet<E> {
+			public InstrumentedSet(Set<E> s) {super(s);}
+
+	* this approach will work with any pre-existing constructor.
+		** TC accepts a base class object so you do not have to override all its constructors
+	* protects against unexpected expansion of the base class because the subclass method in this case, too, would need an override (and in the version with the composition in it would remain the same methods and the new method of the base class would not have access)
+		** but does NOT protect against unexpected extension of the interface by default methods
+	* the downside is that such wrapper classes are not designed for use in callback schemes, where one object passes a reference to itself to another object for subsequent invocation. Because the wrapped object is not aware of its shell, it passes a reference to itself, and as a result, callbacks bypass the shell. This is called a self-identification problem (SELF problem)
+
+
+
+.OVERRIDE EQUALS, HASHCODE, COMPARETO
+
+1) be sure to override this method for classes NEMETALNI-values ::
+        * compare all properties by value
+	  * for this comparison, the term "meaningfully equivalent" should be used instead of the word "equal."
+        * not recommended if implementation is slow
+	* If the class implements an interface that clarifies the conventions for the equals method, specify this interface as the type, which allows comparison of classes that implement this interface. 
+		** If the type has been defined as an interface, you must access the meaningful fields of the argument using the methods of the interface itself. 
+	  
+	
+
+2) you CANNOT override this method for MUTABLE classes, based on the equality of all properties ::
+        * TC as only one of the properties changes then the equality is immediately lost
+        * also the object will be lost immediately in the hash tables TK the hash of the object will change
+        * usually by default equals looks at link equality and many users will be surprised when the default behavior is changed to value equality
+	  
+    
+	  * the fundamental problem of equivalent relations in object-oriented languages. There is no way to extend the class that generates instances and add a value component to it while retaining the conventions for the equals method. The problem is solved by replacing inheritance with composition
+    
+* for mutable classes (for example, DDD aggregates), you should override this method based on the equality of the property selected to determine identity
+        ** it is recommended to make sure that hashcode returns exactly the same value regardless of any changes made to the object
+
+* should both reboot and override equals
+        ** for example, there will be two methods equals(object p) calling equals(MyClass p) 
+
+* whenever implement IComparable should redefine equals
+        ** but contrary to do not necessarily: those when do equals not always need comparable 
+	  ** if there is a lack of consistency with equals then it should be explicitly prescribed in Javadoc
+
+* equals and hashCode should be overridden at the same time 
+        ** these two contracts are interdependent and both are mainly used for search
+        ** this ensures that two objects that are treated as equal have the same hash code
+        ** if objects are NOT equal, they CAN also have the same hash code
+
+* it is recommended to make sure that if equals returns true for any two objects, +
+    the hashcode returns the same value for these objects
+
+* ensure that the hashcode generates a random number distribution for all objects of this type
+        ** TK that minimizes conflicts (matching keys) in the hash table, maybe collisions will decrease the performance
+    
+* do not throw exceptions from equals and hashCode
+        ** from equals it is better to return false than to throw an exception
+
+* on a non-mutable type, you can cache the hash code in the object itself instead of having to recalculate it every time you need it
+
+* by the way, on immutable reference types it is hard to notice the difference between the equality of references and the equality of values
+	** do not override equals for a class with an object pool that manages its instances because there will be no more than one instance with this value (for example, for enumerations) and they can be compared ==
+
+* if you override[someone in my class] of the equals method, call super.equals
+* if you override[no one in my class] the compareTo method, you must choose one of two strategies
+	. do not override the method and make the base class method as final 
+	. inside both methods, make a check for absolute equality of the type of the class being compared, so that the comparison is symmetric for those cases when the subclass object is compared with the superclass object 
+	. you can choose not to override this method at all, but to sort items using Comparator, or use ordered collections that are passed to Comparator (TreeSet, TreeMap, PriorityQueue) instead of Comparable items  
+
+
+1) in equals, the order of comparison is Unimportant  ::
+		- To achieve the best performance, you should first compare those fields that will differ with greater probability, or those that are easier to compare.
+		- if the value of the excess field is equal to the total description of the object as a whole, the comparison of such fields will allow you to save on comparing the actual data, if a discrepancy is revealed.
+2) in compareTo, the order of comparison is important ::
+		- If a class has multiple meaningful fields, the order in which they are compared is critical. 
+		- You have to start with the most significant field and then follow in descending order of importance.
+
+
+
+		.OVERRIDE CLONE METHOD (THE INTERFACE CLONEABLE)
+
+* t-f: it is not recommended to override or use this method at all
+        - instead, you need to use a deep-copying designer or factory
+
+* this method and interface have a completely atypical way of using
+        - if you put the class interface-the marker Cloneable, then the Object.clone will become public for him
+        - provided that in each class in the Clone method you need to call super.clone which will eventually result in a call to Object.clone (this nonauthoritative grip designers)
+        - it turns out that the object is not created explicitly using the constructor, but is created inside the Object.clone
+        - for a mutable object with mutable properties, make a recursive call to the clone method for all properties
+                   
+* you should explicitly write to JavaDoc that it is a deep or surface copy    
+    
+* copy types
+        . deepCopyOf deep copy, copies the object and recursively those all objects in the graph 
+        .  copy shallow copy, copies only the part of the graph     
+
+.OVERRIDE THE TOSTRING METHOD
+
+* intended for debugging purposes only
+       - each developer can change this method as he wants, so this method is unstable
+
+* not intended for output to the end user in the UI
+        - to do this, you need to do your own individual methods
+
+* should override this TC method the default implementation is not very useful    
+    
+* it is necessary to make the string returned from toString as short as possible
+        - no more than the length of one screen placed in the debager (80 characters)
+	  - for large objects or objects whose state is difficult to represent as a string. In such cases, the toString method should return summaries such as "MyClass (1487536 people)»
+
+* it is recommended that you return a unique string associated with this instance of the class
+        - those hash code or address in memory 
+
+* it is necessary to display more understandable property names, if their real names are unreadable
+
+* you should output a localized string that depends on the region
+        - in case of formatting money and dates
+        - it is necessary to format the string according to the current Locale settings.getDefault()
+        
+* cannot return an empty string or null        
+
+* you cannot throw exceptions within a method  
+
+* ToString should not have side effects
+        - TC is one of the reasons debuggers call it otherwise it can make debugging very difficult 
+ 
+* it is recommended that you output a value that can be parsed by the parser for this type
+        - on the type to make a complementary method MyType.parse(obj.toString()) to parse a string back into an object
+ 	 - describe in detail the format of the string in Javadoc. The disadvantage is that if your class is widely used, then by setting this format once, you are bound to it forever
+ 
+* it is necessary to consider security and safety of that information can get not to those hands TK this message can sometimes get to UI
+        - inside the method to request permission to display classified information, and if there is no permission to return only unclassified information
+    
+    
+    
+    
+    
+    
+
+=== override event handlers
+.METHOD - THE EVENT HANDLER
+    
+* to be able to call the user code, use the parameter-lambda method or lambda property,
+    instead of overriding this abstract method
+
+* the method should make protected abstract it will be called when the event occurs    
+        - the subclass must override it in order to process the event 
+
+* method should be called Orimashita
+
+* ?the method takes one parameter "e" of the EventArgs subclass type as input
+        - it should always be checked for null in the method
+    
+
+= = = = method body and return values
+.NAMING
+
+* single-character names of local variables or parameters should be avoided, except for temporary variables and loop variables or when the variable contains an unimportant value. The commonly used single-character names are:
+ * temporary variables have a scope of several lines of code
+[source,java]
+		b - for a variable of type byte;
+		C - for a variable of type char;
+		d - for a variable of type double;
+		e - for exception;
+		f - for variable of type float;
+		i, j, and k - for integer values;
+		l - for a variable of type long;
+		o - for a variable of type Object;
+		s - for a variable of type String;
+		v - for an arbitrary variable of some type.
+		T - type for the generated class
+	        E - element for the generating method
+	        R - return for generated class/method - return value
+
+        * the strongest technique for narrowing the scope of a local variable is to declare it where it is first used 
+		- if the program is improved and the variable is no longer needed, it is easy to forget to remove its Declaration if it is far from the place of the first use of the variable
+
+        * to reduce the scope of local variables, you can split the method into two
+		- The last technique to reduce the scope of local variables is to create small, well-positioned methods.
+
+
+	* abbreviations are recommended, i.e. the first letters of word sequences, 
+		 for example as the CP for the variable storing szypko to an object of class ColoredPoint.
+
+	* abbreviations are recommended
+		- for example, the variable buf to store a pointer to a buffer of some kind
+
+	* mnemonic terms are recommended, organized in such a way as to make it easier to remember and understand, usually when using sets of local variables modeled on common class field names, such as:
+		- in and out, some types of input and output;
+		 off and len, which represents the offset and length.
+
+* long local variables should be made in lowercase with prefixes so that they differ from camel-style properties 
+        - for example v_a_r
+
+
+
+        * it is not recommended to declare multiple local variables in the same Declaration statement
+	- to make the code easier to read
+		
+* although almost any expression can be part of the for loop statement, it is recommended that all three parts only initialize, validate, and update the same counter
+	- if you do not follow these rules, the resulting code will be inconvenient, if not readable
+
+      * recommended foreach instead of for
+	- TC in for Iterator occurs three times in each loop and index variable four times, which gives a great opportunity to use the wrong variable
+	- recommended streams instead of foreach +
+	 TK they have filtering, transformation and parallel iteration
+
+
+.CONVENTIONS
+
+* multiple return in method code is recommended
+
+* cannot return null, return an empty collection instead  
+	- those the user has to write additional code of check on zero and the user can forget to check on zero  
+	- as an empty collection it is better to take existing singletons Collections.emptyList()
+
+* it is recommended to think about the admissibility of repeated method calls
+        - for example, put at the beginning of the method check that the method has already been called 
+
+* ???the main work in the program is performed by calculating expressions
+
+* streamapi is recommended instead of ForEach
+
+
+
+.RETURN OPTIONAL
+
+* if the non-return value is the normal operation of the method, it is better to return Optional.empty
+* it is better not to use it to return values from get-eras
+* do not use it in cases where the method returns a collection of TC in this case it is better to return an empty collection
+	- avoid double packs: other containers, it is better not to turn in the Optional TC they can also be blank as Optional
+
+.RETURN COLLECTION
+
+* prefer to use non-mutable versions in return values
+
+* it is recommended to create your own collections inherited from the basic ones
+
+* cannot return null, return an empty collection instead
+        - TC users will wait for the object
+
+* prefer to use Map if the items stored in the collection have unique keys
+
+* collections that depend on external objects should be returned as a copy
+        - for example, the files on the disk are an external object
+        - a collection that would promptly online track changes to files on disk is difficult or impossible to implement
+
+   
+
+== 6) class properties
+
+
+=== bool
+.NAMING
+
+* call a property in the affirmative form 
+        - for example isError instead of isNoError
+        - for example isFound instead of isNotFound
+
+* in getter you should prefix is instead of get
+        - you can also use the prefix can, has, should
+        - setters are called as usual
+
+* you should choose meaningful names
+        - do not use General: isStatus isFlag 
+
+.CONVENTIONS
+
+* leagues without: they are also referred to in jargon as:
+[source,java]
+	- object fields
+	- instance variables
+	- instance attributes
+	- class variables
+	- static variables
+	- static attributes
+
+
+
+=== collection
+.NAMING
+
+* property names must be plural
+        - this will allow the user to distinguish the properties of the collections from the usual properties
+
+.CONVENTIONS
+
+* as a property type, it is recommended to use: (in order of priority)
+        . their collections inherited from the following basic 
+        . List<>,Set<>,Map<>,Queue<> most suitable for the problem to be solved 
+	   . Collection<> or Iterable<> if I'm writing a framework 
+
+* prefer to use non-mutable versions of collections in the final property
+    
+* properties should always return an online collection (not a copy - snapshot)
+        - TK creating a copy is expensive
+
+* property should never return null
+        - must be initialized by default with an empty collection 
+    
+* property must be final OR with getter only
+        - that the users are unable to take the place of the collection to another by setting the property directly
+        - instead of the setter, you can set the AddRange method to add elements
+
+
+
+        === constant
+.NAMING
+
+* constant names of non-mutable objects are written in capital letters with an underscore between the words
+         for example PERIMENAPAUSAL
+
+* names of related constants must have a common prefix
+         for example: COLOR_RED COLOR_GREEN COLOR_BLUE
+
+.CONVENTIONS
+
+* Java formally considers constants to be:
+	  - static final primitive types
+       - static final object types that are never written with a dot
+       - static final arrays that are never written with a period and [
+those are a simple or primitive value or a reference to a non-mutable object
+
+* the instance of a constant object itself must be of non-mutable type
+        - so it can't be changed.
+
+* avoid using magic numbers in your code, always use constants instead 
+        - they'll all be in one place.
+        - TK they will improve the readability of the code
+
+* it is recommended to use enumerations instead of static constants
+        - improve error checking at compile time
+        - improve the readability of TC all in one package
+        - auto-substitution IDE
+
+* common constants can be placed in an auxiliary class (with private constructors so that it cannot be created)
+	- it is not recommended to put constants in interface to TK the wrong is to implement such interfaces TC then you can not get rid of the "implements IConst"
+     -?? the class itself and the public methods but they will not be exposed by the jigsaw modules
+
+* it is recommended to use constant-valued functions instead of constants       
+		- to more flexibly then it was possible to change the return value        	
+
+* for constants, use public final fields
+- for predefined instances, use the private STATIC final field + get-Ter/function to get the value
+        - ?or is it better separate the factory default instances
+        - ?thus devonny object is a singleton there will be only one
+
+* already set values of constants can never be changed, +
+    otherwise, you would have to recompile all the code that uses them +
+    TK they are embedded as macro permutations
+
+
+
+
+=== getset
+.NAMING
+
+* ALL rules apply to public members only
+        - for private properties, use the suffix _
+	  - you can open(make public) fields of private classes(which no one from the outside will see) and private nested classes
+
+        
+* property names start with a small letter, camel style
+
+* in the two-letter acronyms are the first letters of both small
+        - for example ioStream
+
+* for a property name use nouns, noun groups, or an adjective
+
+* the property should be called in the affirmative form 
+        - for example CanSeek instead of CantSeek
+
+* active voice is better than passive voice
+        - CanSeek instead of IsSeekable
+        
+* ?it is recommended to give properties the same name as their types
+        - for example Color color
+        - it saves meaningful names.
+        
+* do not use the get set prefix for the property name, only for the method name
+
+* numberOf prefix for variables representing the number of objects
+        - do not use the N prefix, Num
+
+* use the no suffix to denote variables representing the entity number
+        - examples: tableNo, employeeNo
+
+
+
+
+.CONVENTIONS
+
+* tf: properties are defined as private fields set with setters/getters (accessor/mutator)
+        - all fields must be private, never set fields as public
+        - under is meant a property of a class
+
+* simple properties create read-only (final and getter only) if the program should not change the value of the properties
+        - by simple we mean non-mutable value-types (not reference types)
+        - but if the property contains a mutable type, then placing only the getter will not help, the type itself can be changed
+
+* do not set the property to setter only
+       - it is necessary for the couple to expose a public getter    
+
+* you must still retain the value even if the seter throws an exception
+        - those even if this property has not been tested in the setter it is still set, or save the value to another location
+
+* do not throw exceptions from hetero
+        - hetaera should be simple operations and should not have post-conditions
+        - if it can cause an exception then it should be made by
+       
+* long operations should be a method and not a property
+        - for example, those who access the network or files 
+        - properties are used for easy access to simple data with simple calculations
+
+* you should use the property if logically it is an attribute of the type
+     
+* Do NOT use Optional as a class property
+        
+
+.PATTERN IS NEW-SET-CALL IN MUTABLE CLASSES
+
+
+
+* this is a pattern in which the class is designed with
+	- with a default or relatively simple constructor
+	- a large number of properties set via setters
+	- and the subsequent call of simple methods of an instance of the class without arguments or a small number of arguments TC all already pre-defined in the properties 
+
+1) this pattern implies  ::
+        * setting a large number of properties of the object controlling the semantics of method calls, and you can set each property separately
+        * and a small number of parameters in the methods themselves
+        
+	* methods must provide actions and properties data for these actions
+
+2) the disadvantage is that you can not use the method in parallel, the object itself can be used only for one query TC parameters are set by the properties of the object ::
+
+3) plus, there can be one version of the method working with a different set of properties, depending on what properties are set ::
+        * for users, it is important that simple TC methods are much more difficult to study the purpose of each method parameter
+
+	* all properties should be given default values
+        - TC the user should be able to call the methods of the object created by the default constructor without parameters
+
+4) with each new feature, you can only add a new property and leave the method the same (inside it will take into account this new feature) ::
+        
+* it should be possible to set properties in any order
+        - this can cause problems in the form of invalid object state when calling the method
+        - the benefits of this pattern exceed these drawbacks (when used in the main scenarios for users, the main thing is the convenience and ease of use)
+        - problems should be mitigated by exceptions/error messages in methods
+
+5) In the setter, you can assign null, but output a message about it in the log ::
+
+* you should check the integrity of the object state already in CALL methods, not in constructors
+
+* properties provide natural self-documenting capability 
+
+* components should primarily rely on properties and components as a means of changing their behavior
+
+
+
+.PATTERN is NEW-CALL nemetalni CLASSES
+
+* this is a pattern in which the class is designed with
+	- complex methods that pass a large number of parameters in calls
+
+1) this pattern implies  ::
+        - setting a large number of parameters in the methods, and all parameters should be filled in all at once with each call (see the Chapter parameters: the number of parameters is not more than 4)
+        - and a small number of object properties
+
+2) plus that it is possible to call such methods in parallel ::
+
+3) the disadvantage is that this pattern produces a large number of overloaded methods ::
+
+4) and with each new feature you add more and more method overloads ::
+
+- conversion and transformation operations are best done by methods with parameters
+- you should check the integrity of the state of the object in the constructors and not in the CALL-methods 
+    
+
+=== lambda
+.NAMING
+
+1) pre-events pre-events ::
+        - to use the present tense of the verb 
+        - called before there will be a side effect
+        - Example: Closing event before closing the window,
+
+2) post-events ::
+        - the past tense of the verb is used for names 
+        - called after a side effect has occurred
+        - Example: Closed event after window closing
+
+  do not use prefixes/postfixes before/after ::
+
+
+.CONVENTIONS
+
+* to be able to call user code, use the-lambda method parameter instead of overriding this abstract method 
+
+
+
+
+=== private (fields)
+.NAMING
+
+* add a dashed suffix to a class field/property that is not exposed via public getter/setter
+        - for example someProp_, it helps to distinguish internal properties from exposed outside via getter/setter
+
+.CONVENTIONS
+
+* all fields must be private, never set fields as public
+        - under is meant a property of a class
+        - the property is set only through heteras and seter
+
+
+    
+
+== 7) types
+.NAMING
+
+* ALL rules apply to public members only
+
+* type names start with a capital letter, camel style
+
+* in both the two-letter acronyms are the first letters of the title
+        - for example IOStream
+        
+* avoid acronyms
+        - you can use well-known acronyms XML,IO,HTML
+        - you can use: Ok, Id
+
+* three or more letter acronyms are considered a common word
+        - for example ProcessHtmlTag, htmlTag
+
+* try NOT to use common names
+         but sometimes can be used in cases when the name has no special meaning and the type is unimportant
+        - example of common names: value, item, element, node, log, message
+        - you should specify these names: FormElement, XmlNode, EventLog, SoapMessage
+        - words should not have double interpretation to avoid side effects
+        - users in their scripts will probably use these names that will lead to a conflict of names
+
+
+
+
+        * word order to choose from all the options was the most easy to read
+        - for example HorisontalAlignment vs Alimenthorisontal
+        
+* readability should be at the expense of brevity        
+         example CanScrollHorisontally vs ScrollableX
+        
+* names should correspond to business or scenarios and not to technologies or patterns
+        - names should reflect usage scenarios rather than inheritance hierarchy      
+
+* type names can be the same for different application models
+         but should not match the names of types of basic frameworks java core 
+        - must not match the keywords of the java programming language
+
+        
+
+.CONVENTIONS
+
+
+
+* TDD is recommended to generate test first
+        - the object model follows from the code examples
+    
+
+
+=== hopscotch
+.NAMING
+
+* class name must be a noun or a noun group
+
+* you can add a suffix as the base class name 
+        - TK is very readable and clearly explains the relationship
+        - recommended for types inherited from standard Java framework types
+
+.CONVENTIONS
+
+
+
+.EXTENSIBILITY
+
+* for extensibility better than regular classes
+        - not final  
+        - without abstract methods 
+        - without protected methods  
+
+* extensibility must be designed in advance
+        - TC users can expand in ways that architects could not foresee:
+        - therefore, it is recommended to use interfaces and abstract classes specifically for extensibility
+
+* finalisation is a mechanism to prevent extensibility
+        - it is necessary to finalize only what is necessary, otherwise users will be very dissatisfied with the TC they like to expand for no reason and just for convenience
+        - finalize methods and classes that are important from a security point of view
+         
+* you can always remove final from a class, but you cannot add it back    
+    
+* you cannot make protected or abstract methods in the final class
+        - TK implies that final classes are not inherited
+
+= = = = abstract
+.NAMING
+* ??add Abstract prefix for abstract classes  
+
+.CONVENTIONS
+
+* these classes are designed for advanced advanced scenarios, and therefore uninteresting to most users
+        - such classes should be in a separate namespace, such as the subpackage of the main scenarios
+
+
+.EXTENSIBILITY
+
+* users cannot be required to: inherit classes or implement interfaces
+        - where it is possible to use lambda instead
+
+* we recommend that you place this logic in the default interface methods instead of abstract classes with partially implemented logic
+
+* specially designed for extensibility through inheritance
+
+* such classes themselves are not suitable for the role of TC interfaces contain too much implementation
+
+* must be accompanied by a complete set of reference documentation describing the necessary semantics of the types implementing the contract
+        - first-class documentation should clearly and thoroughly explain all pre-and post - implementation conditions
+        - otherwise, users will refuse to use the type
+
+* do not make public the TK constructors you cannot instantiate an abstract class
+        - the presence of the designer will only confuse
+        - you should make the protected constructor 
+
+* abstract class is not applicable here for modeling multiple inheritance
+
+.THE PATTERN OF SKELETAL CLASS IMPLEMENTATION (TEMPLATE METHOD)
+
+* help implement interfaces so that users get part of the implementation
+        - for example, if the root of the type hierarchy is an interface:
+        - List -> AbstractList(*) -> MyList
+        - maybe they add another level of hierarchy, they complicate the infrastructure.
+	  - you should study the interface and decide which of the methods are primitives in terms of which other interface methods could be implemented. These primitives will be abstract methods in your skeletal implementation. You must then provide a specific implementation of all other methods of the interface.
+
+.PATTERN SIMPLE IMPLEMENTATION CLASS
+
+* List -> SimpleImplementationClass
+* at least one implementation should be done for each abstract class 
+        - this allows you to check the correctness of the design and correct errors in time
+* A smaller version of the skeletal implementation
+* This is the simplest possible working implementation
+
+
+
+= = = = collection
+.NAMING
+
+* add suffix to name 
+        - Collection
+        - Map
+        - List
+        - Set
+        - Queue
+
+* add a prefix representing the name of the element type
+        - for example, AddressCollection for Collection<Address>
+
+* add prefix for nemetalni Immutable collections
+        - for example, ImmutableAddressCollection for Collection<Address>
+
+
+.CONVENTIONS
+
+* it is recommended to create your own collections inherited from the basic TC: 
+         to give a better name
+        - add your auxiliary members
+        - in the future, to expand the implementation without hindrance
+
+* for a high-level api should prefer collection for low level is to be preferred to faster arrays
+
+* the use of non-mutable arrays is extremely expensive TC will have to clone the array all the time
+
+* do not use obsolete collection types without generic <T>
+        - TC they subtypisation what is the source of errors
+    
+* the collection must be a simple type designed to manage a group of objects with similar characteristics (storing, accessing, and managing items, and no more)
+        - it is strictly impossible to use collections for complex types not related to the above simple actions     
+
+* types of collections:
+        . a copy (snapshot) is a collection that represents a state at some point in time
+        . operational collection - a collection that ALWAYS represents the current state    
+        
+* for nemetalni collections, you must enter the method bool isReadOnly returning true   
+
+* prefer to use Map if the items stored in the collection have unique keys 
+
+= = = = inline
+.NAMING
+
+
+.CONVENTIONS
+
+* you need to create a nested type if you want a class that has access to private variables of another class
+        - maybe that's the whole point of the nested class.
+         but these classes cannot be created independently, maybe if the type may be created independently it means that he has an independent place in the infrastructure 
+
+* it is not recommended to make the nested class public 
+        - TC users do not know how to handle such classes and will not explicitly refer to them or explicitly create objects of such classes
+        - users will see only the interface of the nested class
+        
+
+* return an instance of such a class in a separate method of an external class
+
+      
+        
+
+= = = = static
+.NAMING
+
+
+.CONVENTIONS
+
+* used to store extension methods or functions for which there is no fully object wrapper
+        - it is impossible to use as a heterogeneous set of additions, there should be a clear concept of the methods located in it
+
+* it is recommended to use only as helper classes for the object-oriented infrastructure kernel
+    
+* all properties and methods must be static
+        - should not be ordinary members
+
+* you cannot create objects of this class, there can be only one instance of the class
+        - to make the private default constructor
+		 - as well as the inside of such a designer is necessary to put an AssertionError that the constructor was not accidentally caused from the inside
+        - there should be no other public or protected constructors   
+	  - access to a static property/method of a class through an instance is not welcome 
+    
+* static properties and methods cannot be inherited 
+        - you must explicitly mark this class final
+        - all methods can be marked as final
+
+.JAVA
+
+* in Java pure static can only be nested static classes        
+
+= = = = value
+.NAMING
+* ??add prefix for classes nemetalni Immutable objects 
+
+.CONVENTIONS
+* (mutable)classes with open mutable fields are unsafe in a multithreaded system
+
+* used for small, simple types such as primitive types int, String
+        - type logically represents a single value
+
+* recommended when instances are small, short-lived, and embedded in other objects
+        - class instance size is less than 16 bytes (if the class is large, you should carefully consider whether there will be problems when generating a large number of objects)
+        - short lifetime for example if they are created in a method and are no longer needed after the method performs a reset
+
+* non-portable
+        - all public properties must be non-mutable those final
+			. if the properties are mutable then use protective copy/defencive copying on seerah and courtesans
+        - private default constructor
+        - public only constructors that assign final properties
+        - only getters, no setters.
+	  - so that you can not inherit and erase the data of the subclass
+		. option a) make the class final
+		. option b) close ALL designers and receive objects only by factory
+	  - methods should not return errors, instead of Optional errors (in order to better match functional programming )
+
+
+* be sure to implement equals
+        - comparison by property values
+
+
+
+        * nemetalni classes used in the functional approach: 
+	- operations of a non-mutable class can return a new non-mutable object
+* often newtablename class comes companion: mutable class
+	- this is necessary in order to avoid performance problems and to generate many classes of values
+
+
+     * do not use for accurate/cash calculations float. double, use BigDecimal,int, long instead
+	⁃ float. double has been made to quickly get the correct approximation for a wide range of values. However, these tipene give accurate result
+	⁃ BigDecimal has eight rounding modes and the user can control it
+	⁃ Note that BigDecimal's String constructoris used rather than its double constructor. This is required in order to avoid introducing inaccurate values into the computation. new BigDecimal(".Ten");
+
+
+=== enum
+.NAMING
+
+* for a name use a noun in the singular
+     - Do NOT use the suffix Enum, Flag
+
+
+.ENUMERATION VALUE
+
+* do NOT use any prefix for enumeration values
+        - TK to the values of the enumerations, and so are turning always with the name of the enumeration type itself           
+
+* reserved values cannot be used in the future
+        - TK they only pollute and can lead to errors
+        - I can always add a new value later
+        - I can actually use the enum without values, and add the value then
+        - but in themselves methods I tested on future meaning can add
+
+* be sure to enter a zero value in the enumeration
+        - or the most common value will fulfill this role
+        - call it None
+
+.CONVENTIONS
+
+1) if the property is usually set via the setter, it is better to use bool ::
+
+2) but if the value is usually set through the constructor it is better to use enum ::
+
+* it is better to use enumerations instead of bool parameters
+        - with Boolean parameter it is easier to make a mistake
+        - for example, in the method it is impossible to understand: what is true "case-insensitive" or "case-sensitive" ?
+        
+* you can use chaining methods or chaining method with lambda instead of bool parameters
+	double value = new TaxCalculator().withTaxRegional() .withTaxSurcharge() .calculate(order);
+	double value = new TaxCalculator().with(Tax::regional).with(Tax::surcharge) .calculate(order);
+
+* if the method signature contains two bool parameters in a row, it is better to replace them with an enumeration
+        - TK is very easy to make a mistake by confusing them in places
+
+* it is better to use meaningful names of enumeration values instead of true/false
+        - listings with only two values are fine and common practice
+        
+* when passing an enumeration value to a method, check that the enumerated parameters are correct
+        - in Java, the enum value can have properties, so I can check their values for correctness
+
+.EXTENSIBILITY
+
+* the enumeration is extensible with new values in contrast to bool
+
+* methods should be designed based on the premise that new enumeration values will be added
+
+=== enumset / bit enumerations
+.NAMING
+
+* for a name use a plural noun
+        - those name must end with s, i, ae       
+
+.ENUMERATION VALUE
+
+* you cannot create values that are not valid for simultaneous use or that contradict each other
+        - for this purpose it is better then to create separate enumerations
+        
+* be sure to enter a zero value in the enumeration  
+        - it's supposed to mean NoneOfAll "all unchecked"
+        - represents the default value that is set if none of the values are set
+        - cannot be called None, can be called Default or Error 
+
+
+.CONVENTIONS
+
+* useful additional methods
+        - IsExactlyOneBitSet
+        - CountOnBits
+        - AreAllBitsOn
+        - AreAnyBitsOn
+        - TurnBitsOnOff
+
+* use separate values for check box combinations only if such combinations are common
+
+* check box enumerations in methods should be checked for the inadmissibility of certain combinations of check boxes    
+    
+
+    
+    
+
+=== exception
+.NAMING
+
+* add to the name the suffix Exception
+
+* failure occurs when a method cannot do what it was designed to do
+        - for example, if a method does not do what its name suggests, it should be considered a failure at the method level
+        - ?therefore, the exception can be called a CanNotMethodnameException
+
+
+
+
+        .CONVENTIONS
+
+* it is necessary to document in Javadoc all exceptions caused due to breach of contract method
+
+* such exceptions externally should not change TC they are already part of the contract in Javadoc
+
+* when the user uses the basic api, then it should not be to the exclusion of the extended api 
+        - the user core api needs to only exclude the main api
+        - to do this, low-level exceptions{in high-level methods} can be wrapped in high-level exceptions
+	 - the problem is called loss of failure atomicity and is solved through exception translation idiom	 
+        
+* you cannot use exceptions for normal flow control
+        - those implying that the error will be caused frequently or systematically
+        - exceptions are ONLY used for error messages, problems, failures, abnormal situations
+	  - exception is expensive TK it captures the stack from bottom to top
+
+* additional context information should be passed to the exception constructor
+        - those cannot be called on an exception constructor without parameters
+	  - it is better to make a separate designer
+
+* it is recommended to make serializable exception
+        - default Serializable TC exceptions are inherited from Throwable
+        - to be able to do remote debugging and forward it through remote interaction
+
+* it is recommended to your class explana add hetero/cetera to store additional information about the error and the error context
+
+ in exasan must be public 
+        - otherwise it will be impossible to intercept
+        - but you will be able to intercept parentage exception
+
+* it is recommended to make a call to a separate method exasan
+        - to reduce the code if exasan often called
+        . (choice of safe standing is 1) to bring or throw new exception
+        . (option 2) or make only new exception, it is better for unsupportedOperationException TC do not have to write a mandatory return in the absence of the word throw in the method
+
+* you cannot EXPLICITLY throw exceptions from finally blocks
+        - but implicitly can be
+
+* do not call ixepshen inside the exception class
+
+* the exception must contain 4 standard constructors
+        - public Exception() 
+        - public Exception(String message) 
+        - public Exception(String message, Throwable cause) 
+        - public Exception(Throwable cause) 
+
+* finally block must not contain return
+	- TC it will interrupt the standard return in the try block
+
+
+.THE CONTENTS OF THE ERROR MESSAGE
+
+1) the type of exception itself is the most important information  ::
+        - based on the exception type, the program decides what to do with it
+
+2) the exception should clearly describe what you need to do to fix the problem ::
+        - the text of the message is intended primarily for the developer
+        - end users should not see these messages
+        - bug reports should help developers fix bugs in their code
+        - be sure to report the wrong way to use the api
+        
+3) a message about the reason for the refusal, explaining what went wrong ::
+   
+4) the exception itself is the documentation
+         the exception is the best form of documentation of TK, many developers prefer to code by trial and error and not reading manuals
+        - it is recommended to call the most specific exception that makes sense the most profound/detailed in the inheritance hierarchy
+
+* need to localize the message into different languages
+
+* important security information cannot be disclosed
+        - if the end user does not have the appropriate authority
+        - you should make separate methods(which can only be called by trusted code) to return such information
+        - should the toString exasan to enter the code requesting the right to output the secret information
+
+* the message must be grammatically and syntactically correct
+        - each sentence of the text should end with a period.
+        - do not use question marks or exclamation marks
+
+* ensure that the terminology used in error messages makes sense in the context in which it is used
+        - for example, low-level terminology makes sense only for those who work at the lower level
+     
+     
+        
+.EXCEPTION TYPE
+ 
+1) programming errors, API misuse error (hierarchy Exception::RuntimeException) ::
+        - occurs as a result of an incorrectly written program
+        - such errors are not handled NEED to reprogram the code
+        - the developer must ensure that such an error never occurs at runtime
+        - you need to stop the prog and in detail to inform the user
+        - to throw an exception, you can use an existing subtype from RuntimeException:
+        . An UnsupportedOperationException is called for example when you try to use write methods in readonly collections    
+            	.. for example, you try to use an object until it is initialized correctly
+	            .. for example, write to a file stream that has been opened for reading
+	            .. for example, the method tries to access a nonexistent resource
+        . NullPointerException Objects.requireNonNull()
+        . IndexOutOfBoundsException Objects.checkIndex()
+        . IllegalStateException is called for example, when the values of the object properties contradict each other and the method cannot be called
+        . IllegalArgumentException is called for example when the user passes an incorrect argument value to the method
+        . ConcurrentModificationException if an object is in the same thread, detects that it is being changed/modified from a parallel thread     
+        
+2) environment/environment error (hierarchy Exception::RuntimeException::MyApplicationException) ::
+        - this execution error can be handled programmatically, for example by compensating logic (General processing strategy: attempt recovery)
+        - to throw an exception, it is recommended to create your own exception inherited from RuntimeException 
+			. to separate the hierarchy of run-time errors from a hierarchy of programming errors RuntimeException
+			. inherit from Exception is not possible TC exception will immediately become then Checked
+        - you can use the suffix ApplicationException for the name of your exception
+    
+3) system failures (Error hierarchy) ::
+        - in case of system failure, it is better to simply terminate the program 
+	  - in the case of an internal failure, it is better that the program fails completely, rather than returning incorrect results, which would only confuse and complicate the situation.
+
+
+
+
+	  .STRATEGY WITH THE EXCEPTION IN THE METHOD
+default means unchecked/unchecked exceptions
+
+1) throw concrete UNchecked exception strategy ::
+         just generated in the procedure of exasan, exasan should be uncommon
+        - interrupt strategy
+        - xepshen just automatically goes up
+        - thus, it will help to centralize error trapping at the higher level
+   
+2) catch concrete exception / resolve exception strategy ::
+        - compensation and resumption strategy 
+        - the error allowed right here
+        - catch only the specific exacty, the rest will preobrazyatsya up
+         to catch the exception at the point of failure
+        - to intercept an exception is only when you understand that it was caused in this context and you know how to gracefully correct the situation
+        - catching an exception is recommended at the higher TC level too frequent exceptions at the lower will affect performance
+        - here you can for example run the method again to run after a while and count the number of attempts to run
+
+3) retrow exception strategy: checked->unchecked ::
+        - required/check/checked exception wrapped in an unchecked/unchecked exception
+        - xepshen just automatically goes up
+        - it is necessary when re-throwing an exception, stick to it source to poteryalsya call stack TC if you just re-raise the exception then it replaces the original
+         
+4) a handler for unhandled situations, shuts down the program ::
+        - it is recommended to terminate the process when the code is faced with a situation in which further execution is dangerous for data integrity
+        - handle only those exceptions to which the application can respond reasonably otherwise complete the program
+        - the user should show a standard message: "Microsoft Word has encountered a problem and should close. We apologize for any inconvenience caused."
+        - the raw situation handler is used to recover the file and run the application again
+        - you can also send an error message to improve the product
+        - save the results obtained by the user and restore the data, restart the program or ignore 
+
+
+.ALTERNATIVE STRATEGY
+
+1) return optional strategy ::
+        - return an optional value in the method, which will be empty in case of an error
+        - but you do NOT get the continuation of operators and methods on empty values
+        - you cannot make an optional argument to pass a default parameter, instead it is better to make two reloaded functions 
+        - you cannot use Optional to represent a total value with three States, it is better to use enum instead
+	  - as a result, you can use a chain of functions (optional api, stream api, complete future, reactive api) with implicit checks(covered inside libraries) for an empty value with (as opposed to an explicit check for null)
+
+2) Try.Success / Try.failure ::
+	- code execution with exepsilon conveniently automatically wrapped in a Try
+	- unlike Optional, here we in the second branch(in case of error) can get information about the error
+	- allows to handle errors as values, not as control flow
+	- allows the user to choose whether to generate an exception or not
+
+3) Either.left/Either.right ::
+	- when an exception is unnecessary to us, those we do not create it for ourselves Either consumed (for example based on the Left write the log)
+	- when we need more information about a bug, but we don't want to extend the Exception
+
+4) Publisher<> ::
+	- can get a large variety of convenient signals
+	- you can combine streams into one long continuous stream
+
+4) return default value strategy ::
+        - in case of error, return the object dummy 
+        - thus we get the continuation of the program on empty values
+	  - this specially-reserved value is called "sentinel value"
+
+5) tester-doer pattern ::
+        - for example, the add method (to add an item to a collection) will throw an exception if the collection is read-only
+          this can be a performance problem in scenarios where the method will often fail
+          therefore, before you try to add a value, you should check the collection with the tester method isReadOnly
+        - pattern will improve performance if the TEST is much cheaper than ACTION to challenge explana
+        - this pattern can introduce race conditions in a multithreaded method call if the class was originally designed with multithreading in mind(which is probably not the case)
+        - tester -a method used to check the preconditions of another method, and returning bool (instead of an exception)
+        - doer -method that actually does the job
+
+6) try-parse pattern ::
+        - this pattern is recommended only if you need to improve performance in a low-level api
+        - if we have a method (e.g. Parse) that can throw an exception 
+          then we can make an alternative version of the method (call it TryParse) without exception
+        - it will return true if successful in the tuple (true,result)  
+        - Parse is actually any method for which we make an alternative method
+        - TryParse is an alternative method that does not throw exceptions and returns (true|false,result|null)  
+
+7) catch all -> log ->rethrow ::
+	  - Sometimes you need to pledge an exception in one place and re-generate it without any changes, and process it in another place
+
+8) the pattern of costly verification, then, they did not check the code ::
+	- if the check is implicitly performed when the object is working inside the code
+	- but then may need to make a stream exception rethrow exception strategy: unchecked->unchecked so the user got exasan which he expects
+
+
+
+.NOT A RECOMMENDED STRATEGY FOR EXCEPTION IN METHOD
+
+1) catch all exceptions strategy: catch(Exception e), catch(RuntimeException e) ::
+         absolutely can not "swallow" the error by catching an undefined General exception
+        - in this case, you can not predict at all what state the software model is in. 
+        - you risk that the use of the continuation of the work of the program will exceed the risk of processing unreliable data
+        - it is only allowed to pass this exception to another thread those it is in this case not actually swallowed
+
+2) throw Exception/RuntimeException strategy ::
+        - General exceptions should not be thrown
+        - TC these exceptions are too General to provide useful information
+
+3) throw concrete checked exception / throws strategy ::
+        - generate in procedure checked/checked xepshen, should not be common
+        - it is not recommended to generate checked exceptions
+        - it is not recommended to do throws methods
+
+4) retrow exception strategy: checked->checked  ::
+        - not recommended TK under the new exception you have reported about the new failure instead of the failure which has occurred actually  
+        - but sometimes it is beneficial to wrap a lower-level exception into an exception that is meaningful to higher-level users
+        - this wrap should be rare.
+        - this wrap will probably have a negative impact on debugging capabilities
+        - the practice of catch c wrap is undesirable and is just another form of swallowing bugs
+	  - this also applies in part to paragraph (3)
+
+5) return null strategy ::
+        - it is not recommended to use TC in when trying to use a null object will throw an exception {not in the method but elsewhere}
+        - leads to frequent null checks
+	  - null (as error) can be confused with null (as with business value, also called "business null")
+
+
+
+
+
+	  6) return error ::
+        - it is not recommended to return an error or error code in return
+        - the presence of two alternative mechanisms{1) acceptenv 2)return error} the error message is confusing and leads to inconsistent application API
+        - exceptions, unlike return, cannot be ignored, which increases the reliability and robustness of the code
+        - but you can still return status information in return if the operation is successful, the user can expect it (for example, the number of inserted records, etc)
+        - special tools are created for exceptions: debuggers, profilers
+        - exceptions are not associated with the method signature, which makes it possible to design the return value independently
+
+
+
+
+=== interfaces
+.NAMING
+
+* for feature interfaces, the name must be an adjective
+        - adjective+noun, but the adjective is the main word (the so-called adjunctive adjective)
+	  - like endings, formed from adjectives in -able and -ible, for example Runnable and Accessible
+        
+* the implementing interface class must use the suffix as the interface name
+        - for example, Default+interface name for the default implementation
+	  - out-of-date suffix Impl not using         
+
+.CONVENTIONS
+
+* the interface does exactly one thing, if the interface has several functionalities then it is bad
+
+* easier to understand the interface by understanding how it fits into the wider picture of the implementations of this interface and the code calling this interface
+        - for each interface you need to make at least one implementation of the usual class, the user can inherit the implementation and get the implementation for free
+        - each interface must have at least one method or property that uses it
+        - you also need to provide test cases so that the user can check whether he understands the interface correctly
+
+* service methods do static methods on a class with a private constructor and not on the interface TC processing methods can contain state and caches
+	 intrface only be used to specify the type
+
+.EXTENSIBILITY
+
+* users cannot be required to: inherit classes or implement interfaces
+        - where it is possible to use lambda instead
+
+* specially designed for extensibility through inheritance
+        - you should choose the interface if the program needs a common api
+
+* interfaces are used to model multiple inheritance
+
+* at least one implementation needs to be done for each interface 
+        - this allows you to check the correctness of the design and correct errors in time
+
+* must be accompanied by a complete set of reference documentation describing the necessary semantics of the types implementing the contract
+        - first-class documentation should clearly and thoroughly explain all pre-and post - implementation conditions
+        - otherwise, users will refuse to use the type
+
+* you cannot create TC constructors you cannot create interface objects
+
+* once an interface is developed, the set of its public abstract members is set forever and does not change
+        - therefore, the main difficulty in designing the correct set of abstract interface methods
+        - optional public default methods can be added for the extension
+        
+* number of public methods        
+        - if the interface has too many methods, it is difficult or even impossible to implement
+        - if the interface has too few methods for the promised functionality, it becomes useless in many interesting scenarios
+    
+THE PATTERN OF SKELETAL CLASS IMPLEMENTATION (TEMPLATE METHOD)
+
+* best suited for creating the root of a type hierarchy {in the example below, marked with an asterisk}
+        - List(*) -> AbstractList -> MyList
+* pattern is implemented by default methods on the interface
+* such implementation is more incomplete in comparison with abstract class
+	- TC cannot be overridden by equals, hashCode, toString 
+	- TC default methods can not override the Object methods (but in General they can be overridden )
+	
+
+see also PATTERN SIMPLE IMPLEMENTATION CLASS
+
+* at least one implementation needs to be done for each interface 
+        - this allows you to check the correctness of the design and correct errors in time
+
+
+= = = = lambda
+.NAMING
+
+* add a suffix to the functional interface name 
+        - Handler.
+        - Callback
+
+* to add to the name of the method of the functional interface raise
+        - do not use the words fire, trigger
+
+
+.CONVENTIONS
+
+* it is better to use function references instead of lambdas
+	- TK the meaning of lambdas is that they are a more concise form of anonymous classes, and links are obtained even more concise record
+	- especially better to use existing library functions
+	- if lambda more than 3 lines of code it is better to make such a lambda in a separate function and make a reference to it
+	
+* use lambda instead of anonymous functions
+
+* functional interface method parameters for the event handler:
+        - Object sender - to send the object from whom the event came
+        - EventArgs e - to pass event arguments
+        - void - for return result
+    
+* in the EventArgs class, it is recommended to make the Cancel event parameter to cancel the event from inside the handler
+        
+* it is recommended that you notify property changes only in high-level APIs of common scenarios
+        - otherwise, such events will come too often if you bring them to a lower level
+    
+* property change notification events: it is recommended to notify only when properties are changed from the outside
+
+* when calling the event, the user is strictly prohibited 
+        . specify a zero sender when sending the TC event subscribers can use it and expect it to be non-zero    
+        . specify a null event parameter, it is better to pass EventArgs instead of zero.Empty
+
+* the lambdas can be problems with the locks of TK yuzersky code lambda unknown
+
+
+
+.EXTENSIBILITY
+
+* do not require users to: inheriting classes or implementing interfaces is better to use instead of the lambda  
+         lambdas can be compared with the extensibility using abstract methods
+         lambda is easier for users of TC do not require knowledge of OOP inheritance and the template method pattern
+        - lambdas can provide runtime extensibility , and abstract methods are implemented only at compile time
+         lambdas work more slowly (and take more memory mesta) than pre-compiled overridden methods
+
+* lambdas provide extensibility by allowing user code to be called from the infrastructure
+        - lambdas are usually passed in a method parameter
+        
+* a custom subclass is recommended instead of EventArgs to pass an event parameter
+        - then it can always be expanded with additional properties
+
+.THE ARGUMENT OF THE METHOD - LAMBDA
+    
+* it is recommended that you use standard lambda types instead of creating custom lambda interfaces
+        - interface Function<T, R> R apply(T);
+        - interface UnaryOperator<T> T apply(T);
+         interface BiFunction<T, U, R> R apply(T T, U U);
+        - interface BinaryOperator<T> T apply(T t, T u);
+        - interface Predicate<T> boolean test(T);
+        - interface Consumer<T> void accept(T);
+        - interface Supplier<T> T get();
+
+* in some cases, do not use standard types of lambdas:
+	- It will be commonly used and could benefit from a descriptive name.
+	- It has a strong contract associated with it.
+	- It would benefit from custom default methods.
+
+
+
+
+
+= = = = static
+.NAMING
+
+
+.CONVENTIONS
+
+* static properties and methods cannot be inherited 
+        - you need to make this interface final
+         methods I may not be clearly marked as final TC refers to the default
+
+
+         
